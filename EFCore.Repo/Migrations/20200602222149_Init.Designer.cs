@@ -7,29 +7,32 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace EFCore.WebAPI.Migrations
+namespace EFCore.Repo.Migrations
 {
     [DbContext(typeof(HeroiContext))]
-    [Migration("20200602202011_HeroisBatalhas_Identidade")]
-    partial class HeroisBatalhas_Identidade
+    [Migration("20200602222149_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.14-servicing-32113")
+                .HasAnnotation("ProductVersion", "3.1.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("EFCore.WebAPI.Models.Arma", b =>
+            modelBuilder.Entity("EFCore.Dominio.Arma", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("HeroiId");
+                    b.Property<int>("HeroiId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Nome");
+                    b.Property<string>("Nome")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -38,43 +41,52 @@ namespace EFCore.WebAPI.Migrations
                     b.ToTable("Armas");
                 });
 
-            modelBuilder.Entity("EFCore.WebAPI.Models.Batalha", b =>
+            modelBuilder.Entity("EFCore.Dominio.Batalha", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime>("DataFim");
+                    b.Property<DateTime>("DataFim")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DataInicio");
+                    b.Property<DateTime>("DataInicio")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Descricao");
+                    b.Property<string>("Descricao")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Nome");
+                    b.Property<string>("Nome")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Batalhas");
                 });
 
-            modelBuilder.Entity("EFCore.WebAPI.Models.Heroi", b =>
+            modelBuilder.Entity("EFCore.Dominio.Heroi", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Nome");
+                    b.Property<string>("Nome")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Herois");
                 });
 
-            modelBuilder.Entity("EFCore.WebAPI.Models.HeroiBatalha", b =>
+            modelBuilder.Entity("EFCore.Dominio.HeroiBatalha", b =>
                 {
-                    b.Property<int>("BatalhaId");
+                    b.Property<int>("BatalhaId")
+                        .HasColumnType("int");
 
-                    b.Property<int>("HeroiId");
+                    b.Property<int>("HeroiId")
+                        .HasColumnType("int");
 
                     b.HasKey("BatalhaId", "HeroiId");
 
@@ -83,15 +95,18 @@ namespace EFCore.WebAPI.Migrations
                     b.ToTable("HeroisBatalhas");
                 });
 
-            modelBuilder.Entity("EFCore.WebAPI.Models.IdentidadeSecreta", b =>
+            modelBuilder.Entity("EFCore.Dominio.IdentidadeSecreta", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("HeroiId");
+                    b.Property<int>("HeroiId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("NomeReal");
+                    b.Property<string>("NomeReal")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -101,33 +116,37 @@ namespace EFCore.WebAPI.Migrations
                     b.ToTable("IdentidadesSecretas");
                 });
 
-            modelBuilder.Entity("EFCore.WebAPI.Models.Arma", b =>
+            modelBuilder.Entity("EFCore.Dominio.Arma", b =>
                 {
-                    b.HasOne("EFCore.WebAPI.Models.Heroi", "Heroi")
+                    b.HasOne("EFCore.Dominio.Heroi", "Heroi")
                         .WithMany("Armas")
                         .HasForeignKey("HeroiId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
-            modelBuilder.Entity("EFCore.WebAPI.Models.HeroiBatalha", b =>
+            modelBuilder.Entity("EFCore.Dominio.HeroiBatalha", b =>
                 {
-                    b.HasOne("EFCore.WebAPI.Models.Batalha", "Batalha")
+                    b.HasOne("EFCore.Dominio.Batalha", "Batalha")
                         .WithMany("HeroisBatalhas")
                         .HasForeignKey("BatalhaId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("EFCore.WebAPI.Models.Heroi", "Heroi")
+                    b.HasOne("EFCore.Dominio.Heroi", "Heroi")
                         .WithMany("HeroisBatalhas")
                         .HasForeignKey("HeroiId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
-            modelBuilder.Entity("EFCore.WebAPI.Models.IdentidadeSecreta", b =>
+            modelBuilder.Entity("EFCore.Dominio.IdentidadeSecreta", b =>
                 {
-                    b.HasOne("EFCore.WebAPI.Models.Heroi", "Heroi")
+                    b.HasOne("EFCore.Dominio.Heroi", "Heroi")
                         .WithOne("Identidade")
-                        .HasForeignKey("EFCore.WebAPI.Models.IdentidadeSecreta", "HeroiId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("EFCore.Dominio.IdentidadeSecreta", "HeroiId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
