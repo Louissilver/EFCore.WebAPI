@@ -14,19 +14,21 @@ namespace EFCore.WebAPI.Controllers
     [ApiController]
     public class BatalhaController : ControllerBase
     {
-        private readonly HeroiContext _context;
-        public BatalhaController(HeroiContext context)
+        private readonly IEFCoreRepository _repo;
+
+        public BatalhaController(IEFCoreRepository repo)
         {
-            _context = context;
+            _repo = repo;
         }
 
         // GET: api/Batalha
         [HttpGet]
-        public ActionResult Get()
+        public async Task<IActionResult> Get()
         {
             try
             {
-                return Ok(new Batalha());
+                var batalhas = await _repo.GetAllBatalhas(true);  
+                return Ok(batalhas);
             }
             catch (Exception ex)
             {
@@ -36,21 +38,35 @@ namespace EFCore.WebAPI.Controllers
 
         // GET: api/Batalha/5
         [HttpGet("{id}", Name = "GetBatalha")]
-        public string Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            return "value";
+            try
+            {
+                var batalhas = await _repo.GetBatalhaById(id, true);
+
+                return Ok(batalhas);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Erro: {ex}");
+            }
         }
 
         // POST: api/Batalha
         [HttpPost]
-        public ActionResult Post(Batalha model)
+        public async Task<IActionResult> Post(Batalha model)
         {
             try
             {
-                _context.Batalhas.Add(model);
-                _context.SaveChanges();
-
-                return Ok("BAZINGA");
+                _repo.Add(model);
+                if (await _repo.SaveChangeAsync())
+                {
+                    return Ok("Registro efetuado com sucesso!");
+                }
+                else
+                {
+                    return Ok("Não foi possível salvar seu registro!");
+                }
             }
             catch (Exception ex)
             {
@@ -60,28 +76,48 @@ namespace EFCore.WebAPI.Controllers
 
         // PUT: api/Batalha/5
         [HttpPut("{id}")]
-        public ActionResult Put(int id, Batalha model)
+        public async Task<IActionResult> Put(int id, Batalha model)
         {
             try
             {
-                if (_context.Batalhas.AsNoTracking().FirstOrDefault(b => b.Id == id) != null)
+                var batalha = await _repo.GetBatalhaById(id);
+                if (batalha != null)
                 {
-                    _context.Update(model);
-                    _context.SaveChanges();
-                    return Ok("BAZINGA");
+                    _repo.Update(model);
+                    if (await _repo.SaveChangeAsync())
+                    {
+                        return Ok("Registro alterado com sucesso!");
+                    }
                 }
-                return Ok("Não encontrado!");
             }
             catch (Exception ex)
             {
                 return BadRequest($"Erro: {ex}");
             }
+            return BadRequest("Não deletado!");
         }
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            try
+            {
+                var batalha = await _repo.GetBatalhaById(id);
+                if (batalha != null)
+                {
+                    _repo.Delete(batalha);
+                    if(await _repo.SaveChangeAsync())
+                    {
+                        return Ok("Registro deletado com sucesso!");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Erro: {ex}");
+            }
+            return BadRequest("Não deletado!");
         }
     }
 }
